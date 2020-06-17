@@ -30,7 +30,16 @@ resource "oci_core_instance" "owl-vm" {
 
   metadata = {
     ssh_authorized_keys = var.ssh_public_key
-    user_data           = base64encode(file("./scripts/setup.sh"))
+    user_data           = base64encode(
+      join(
+        "\n",
+        [
+          "#!/usr/bin/env bash",
+          "export KEY='${var.key}'",
+          file("./scripts/setup.sh")
+        ]
+      )
+    )
   }
 
   freeform_tags = map(var.tag_key_name, var.tag_value)

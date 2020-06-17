@@ -52,6 +52,10 @@ variable "custom_image_id" {
 #  Compute Configuration   #
 ############################
 
+variable "key" {
+  description = "OwlDQ product key"
+}
+
 variable "vm_display_name" {
   description = "Instance Name"
   default     = "owl-vm"
@@ -166,7 +170,7 @@ variable "nsg_https_port" {
 
 variable "nsg_http_port" {
   description = "HTTP Port"
-  default     = 80
+  default     = 9000
 }
 
 ############################
