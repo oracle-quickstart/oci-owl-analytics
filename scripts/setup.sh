@@ -21,11 +21,11 @@ wget --quiet https://owl-packages.s3.amazonaws.com/additional/orientdb.tar.gz
 mv spark-2.3.4-bin-hadoop2.6.tgz spark-2.3.2-bin-hadoop2.6.tgz
 sed -i 's/com.owl.org.postgresql.Driver/org.postgresql.Driver/g' setup.sh
 ##
-./setup.sh -port=9000 -owlbase=/opt -owlpackage=/home/owl/build -options=postgres,spark,owlagent,orient,owlweb -pgpassword=owl123 -pgserver=localhost
+sudo -u opc ./setup.sh -port=9000 -owlbase=/opt -owlpackage=/home/opc/build -options=postgres,spark,owlagent,orient,owlweb -pgpassword=owl123 -pgserver=localhost
 sleep 2
 echo "key=$KEY" >> /opt/owl/config/owl.properties
 ##
-/home/owl/stopAll.sh
+/home/opc/stopAll.sh
 sleep 3
-/home/owl/startAll.sh
+/home/opc/startAll.sh
 sleep 2
