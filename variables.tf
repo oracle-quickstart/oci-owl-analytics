@@ -10,6 +10,9 @@ variable "tenancy_ocid" {
 variable "region" {
 }
 
+variable "compartment_ocid" {
+}
+
 ###############################################################################
 #  Marketplace Image Listing - information available in the Partner portal    #
 ###############################################################################
@@ -51,7 +54,7 @@ variable "custom_image_id" {
 
 variable "vm_display_name" {
   description = "Instance Name"
-  default     = "simple-vm"
+  default     = "owl-vm"
 }
 
 variable "vm_compute_shape" {
@@ -62,7 +65,7 @@ variable "vm_compute_shape" {
 # only used for E3 Flex shape
 variable "vm_flex_shape_ocpus" {
   description = "Flex Shape OCPUs"
-  default = 1 
+  default = 1
 }
 
 variable "availability_domain_name" {
@@ -115,7 +118,7 @@ variable "vcn_dns_label" {
 variable "subnet_type" {
   description = "Choose between private and public subnets"
   default     = "Public Subnet"
-  #or  
+  #or
   #default     = "Private Subnet"
 }
 
@@ -169,14 +172,6 @@ variable "nsg_http_port" {
 ############################
 # Additional Configuration #
 ############################
-
-variable "compute_compartment_ocid" {
-  description = "Compartment where Compute and Marketplace subscription resources will be created"
-}
-
-variable "network_compartment_ocid" {
-  description = "Compartment where Network resources will be created"
-}
 
 variable "tag_key_name" {
   description = "Free-form tag key name"

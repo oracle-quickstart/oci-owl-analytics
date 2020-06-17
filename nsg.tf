@@ -1,6 +1,6 @@
 resource "oci_core_network_security_group" "simple_nsg" {
   #Required
-  compartment_id = var.network_compartment_ocid
+  compartment_id = var.compartment_ocid
   vcn_id         = local.use_existing_network ? var.vcn_id : oci_core_vcn.simple.0.id
 
   #Optional

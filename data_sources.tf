@@ -3,9 +3,9 @@ data "oci_identity_availability_domain" "ad" {
   ad_number      = var.availability_domain_number
 }
 
-data "oci_core_images" "autonomous_ol7" {
-  compartment_id   = var.compute_compartment_ocid
-  operating_system = "Oracle Autonomous Linux"
+data "oci_core_images" "ol7" {
+  compartment_id   = var.compartment_ocid
+  operating_system = "Oracle Linux"
   sort_by          = "TIMECREATED"
   sort_order       = "DESC"
   state            = "AVAILABLE"
@@ -13,7 +13,7 @@ data "oci_core_images" "autonomous_ol7" {
   # filter restricts to pegged version regardless of region
   filter {
     name   = "display_name"
-    values = [Oracle-Linux-7.8-2020.06.09-0"]
+    values = ["Oracle-Linux-7.8-2020.06.09-0"]
     regex  = false
   }
 

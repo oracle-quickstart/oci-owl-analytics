@@ -3,19 +3,19 @@
 ###
 
 output "instance_id" {
-  value = oci_core_instance.simple-vm.id
+  value = oci_core_instance.owl-vm.id
 }
 
 output "instance_public_ip" {
-  value = oci_core_instance.simple-vm.public_ip
+  value = oci_core_instance.owl-vm.public_ip
 }
 
 output "instance_private_ip" {
-  value = oci_core_instance.simple-vm.private_ip
+  value = oci_core_instance.owl-vm.private_ip
 }
 
 output "instance_https_url" {
-  value = (local.is_public_subnet ? "https://${oci_core_instance.simple-vm.public_ip}" : "https://${oci_core_instance.simple-vm.private_ip}")
+  value = (local.is_public_subnet ? "https://${oci_core_instance.owl-vm.public_ip}" : "https://${oci_core_instance.owl-vm.private_ip}")
 }
 
 ###

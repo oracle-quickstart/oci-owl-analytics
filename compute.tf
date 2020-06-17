@@ -1,6 +1,6 @@
 resource "oci_core_instance" "owl-vm" {
   availability_domain = local.availability_domain
-  compartment_id      = var.compute_compartment_ocid
+  compartment_id      = var.compartment_ocid
   display_name        = var.vm_display_name
   shape               = var.vm_compute_shape
 
