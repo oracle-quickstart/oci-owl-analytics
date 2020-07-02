@@ -4,6 +4,44 @@ cd ~opc
 export JAVA_HOME=/usr
 export SPARK_HOME=/opt/owl/spark
 export PATH=$PATH:/opt/owl/spark/bin
+
+cat << EOF > startAll.sh
+#!/usr/bin/env bash
+export INSTALL_PATH=/opt/owl
+export LOG_PATH=/opt/owl/log
+export SPARK_HOME=/opt/owl/spark
+export JAVA_HOME=/usr
+### Start Postgres Metastore
+export PGDBPATH=/opt/owl/owl-postgres/bin/data
+    if [ -f $INSTALL_PATH/owl-postgres/bin/pg_ctl ]; then
+        #sh $INSTALL_PATH/orientdb/bin/server.sh >$LOG_PATH/orient-start.log 2>$LOG_PATH/orient-error.log &
+        #sh $INSTALL_PATH/owl-postgres/bin/initdb >$LOG_PATH/postgres-init.log 2>$LOG_PATH/postgres-init-error.log & echo $! >/dev/null
+        $INSTALL_PATH/owl-postgres/bin/pg_ctl -D $PGDBPATH start >$LOG_PATH/postgres-start.log 2>$LOG_PATH/postgres-start-error.log & echo $! >/dev/null
+        #>$LOG_PATH/owl-web-app.log 2>$LOG_PATH/owl-web-app.error.log & echo $! >/dev/null
+    else
+       __die "Cannot find $INSTALL_PATH/owl-postgres/bin/pg_ctl"
+    fi
+sleep 3
+### Start Owl spark master
+$SPARK_HOME/sbin/start-master.sh
+sleep 2
+### Start Owl Spark workers
+SPARK_WORKER_INSTANCES=4 SPARK_WORKER_CORES=2 $SPARK_HOME/sbin/start-slaves.sh
+sleep 3
+### Start Owl-Web
+/opt/owl/bin/owlmanage.sh "start=owlweb"
+sleep 2
+###
+EOF
+
+cat << EOF > stopAll.sh
+#!/usr/bin/env bash
+/opt/owl/bin/owlmanage.sh "stop=owlweb"
+/opt/owl/spark/sbin/stop-all.sh
+/opt/owl/owl-postgres/bin/pg_ctl -D /opt/owl/owl-postgres/bin/data stop
+EOF
+
+
 ssh-keygen -t rsa -N "" -f ~opc/.ssh/id_rsa
 cat ~opc/.ssh/id_rsa.pub >> ~opc/.ssh/authorized_keys
 ## Install Java 1.8
