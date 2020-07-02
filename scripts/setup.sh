@@ -4,6 +4,11 @@ cd ~opc
 export JAVA_HOME=/usr
 export SPARK_HOME=/opt/owl/spark
 export PATH=$PATH:/opt/owl/spark/bin
+export INSTALL_PATH=/opt/owl
+export LOG_PATH=/opt/owl/log
+export SPARK_HOME=/opt/owl/spark
+export JAVA_HOME=/usr
+export PATH=$PATH:/opt/owl/spark/bin
 
 cat << EOF > startAll.sh
 #!/usr/bin/env bash
@@ -11,6 +16,7 @@ export INSTALL_PATH=/opt/owl
 export LOG_PATH=/opt/owl/log
 export SPARK_HOME=/opt/owl/spark
 export JAVA_HOME=/usr
+export PATH=$PATH:/opt/owl/spark/bin
 ### Start Postgres Metastore
 export PGDBPATH=/opt/owl/owl-postgres/bin/data
     if [ -f $INSTALL_PATH/owl-postgres/bin/pg_ctl ]; then
@@ -41,9 +47,13 @@ cat << EOF > stopAll.sh
 /opt/owl/owl-postgres/bin/pg_ctl -D /opt/owl/owl-postgres/bin/data stop
 EOF
 
+chown opc:opc startAll.sh stopAll.sh
+chmod 755 startAll.sh stopAll.sh
 
 ssh-keygen -t rsa -N "" -f ~opc/.ssh/id_rsa
 cat ~opc/.ssh/id_rsa.pub >> ~opc/.ssh/authorized_keys
+chown opc:opc .ssh/id_rsa .ssh/id_rsa.pub
+
 ## Install Java 1.8
 yum install -y java-1.8.0-openjdk
 ##
@@ -59,11 +69,11 @@ wget --quiet https://owl-packages.s3.amazonaws.com/additional/orientdb.tar.gz
 mv spark-2.3.4-bin-hadoop2.6.tgz spark-2.3.2-bin-hadoop2.6.tgz
 sed -i 's/com.owl.org.postgresql.Driver/org.postgresql.Driver/g' setup.sh
 ##
-sudo -u opc ./setup.sh -port=9000 -owlbase=/opt -owlpackage=/home/opc/build -options=postgres,spark,owlagent,orient,owlweb -pgpassword=owl123 -pgserver=localhost
+printf '\nowl123\nowl123\n' | sudo --preserve-env -u opc ./setup.sh -port=9000 -owlbase=/opt -owlpackage=/home/opc/build -options=postgres,spark,owlagent,orient,owlweb -pgpassword=owl123 -pgserver=localhost
 sleep 2
 echo "key=$KEY" >> /opt/owl/config/owl.properties
 ##
-/home/opc/stopAll.sh
+sudo -u opc /home/opc/stopAll.sh
 sleep 3
-/home/opc/startAll.sh
+sudo -u opc /home/opc/startAll.sh
 sleep 2
