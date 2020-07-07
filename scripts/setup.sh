@@ -9,6 +9,8 @@ export LOG_PATH=/opt/owl/log
 export SPARK_HOME=/opt/owl/spark
 export JAVA_HOME=/usr
 export PATH=$PATH:/opt/owl/spark/bin
+export PGDBPATH=/opt/owl/owl-postgres/bin/data
+export cpu_num=$(lscpu | awk -F":" '/^CPU\(s\)/ { print $2 }' | tr -d ' ')
 
 cat << EOF > startAll.sh
 #!/usr/bin/env bash
@@ -46,8 +48,37 @@ cat << EOF > stopAll.sh
 /opt/owl/spark/sbin/stop-all.sh
 /opt/owl/owl-postgres/bin/pg_ctl -D /opt/owl/owl-postgres/bin/data stop
 EOF
+cat << EOF > spark_env.sh
+##Setup worker instances
+export cpu_num=$(lscpu | awk -F":" '/^CPU\(s\)/ { print $2 }' | tr -d ' ')
+case $cpu_num in
+  "4")
+   SPARK_WORKER_CORES=1
+   SPARK_WORKER_INSTANCES=2
+   SPARK_WORKER_MEMORY=1g ;;
+  "8")
+   SPARK_WORKER_CORES=2
+   SPARK_WORKER_INSTANCES=2
+   SPARK_WORKER_MEMORY=2g ;;
+  "16")
+   SPARK_WORKER_CORES=2
+   SPARK_WORKER_INSTANCES=5
+   SPARK_WORKER_MEMORY=4g ;;
+  "32")
+   SPARK_WORKER_CORES=2
+   SPARK_WORKER_INSTANCES=12
+   SPARK_WORKER_MEMORY=4g;;
+  "64")
+   SPARK_WORKER_CORES=2
+   SPARK_WORKER_INSTANCES=28
+   SPARK_WORKER_MEMORY=4g ;;
+  *)
+   SPARK_WORKER_CORES=2 SPARK_WORKER_INSTANCES=2 SPARK_WORKER_MEMORY=1g ;;
+esac
 
-chown opc:opc startAll.sh stopAll.sh
+EOF
+
+chown opc:opc startAll.sh stopAll.sh spark_env.sh
 chmod 755 startAll.sh stopAll.sh
 
 ssh-keygen -t rsa -N "" -f ~opc/.ssh/id_rsa
@@ -60,6 +91,7 @@ yum install -y java-1.8.0-openjdk
 mkdir /opt/owl/
 chmod -R 777 /opt
 mkdir build
+chown -R opc:opc /home/opc/build
 ## Get Owl Packages, spark.
 cd build
 wget --quiet https://owl-packages.s3.amazonaws.com/owl-2.9.0-package-rhel7-base.tar.gz
@@ -75,5 +107,6 @@ echo "key=$KEY" >> /opt/owl/config/owl.properties
 ##
 sudo -u opc /home/opc/stopAll.sh
 sleep 3
+cat /home/opc/spark_env.sh >> /opt/owl/spark/bin/load-spark-env.sh
 sudo -u opc /home/opc/startAll.sh
 sleep 2
